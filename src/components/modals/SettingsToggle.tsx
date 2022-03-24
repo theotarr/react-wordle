@@ -1,4 +1,6 @@
+import { Switch } from '@headlessui/react'
 import classnames from 'classnames'
+import { useState } from 'react'
 
 type Props = {
   settingName: string
@@ -13,34 +15,51 @@ export const SettingsToggle = ({
   handleFlag,
   description,
 }: Props) => {
-  const toggleHolder = classnames(
-    'w-14 h-8 flex shrink-0 items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out cursor-pointer',
-    {
-      'bg-green-400': flag,
-    }
-  )
-  const toggleButton = classnames(
-    'bg-white w-6 h-6 rounded-full shadow-md transform duration-300 ease-in-out cursor-pointer',
-    {
-      'translate-x-6': flag,
-    }
-  )
+  const [enabled, setEnabled] = useState(flag)
+
+  function handleToggle() {
+    setEnabled(!enabled)
+    handleFlag(!flag)
+  }
 
   return (
-    <>
-      <div className="flex justify-between gap-4 py-3">
-        <div className="mt-2 text-left text-gray-500 dark:text-gray-300">
-          <p className="leading-none">{settingName}</p>
-          {description && (
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-300">
-              {description}
-            </p>
+    <Switch.Group
+      as="div"
+      className="flex items-center justify-between gap-4 py-4"
+    >
+      <span className="flex flex-grow flex-col">
+        <Switch.Label
+          as="span"
+          className={`text-left text-sm font-medium text-gray-900 dark:text-gray-100 ${
+            description ? '' : '-mt-1' // center setting name if there is no description
+          }`}
+          passive
+        >
+          {settingName}
+        </Switch.Label>
+        <Switch.Description
+          as="span"
+          className="text-left text-sm text-gray-500 dark:text-gray-400"
+        >
+          {description}
+        </Switch.Description>
+      </span>
+      <Switch
+        checked={enabled}
+        onChange={() => handleToggle()}
+        className={classnames(
+          enabled ? 'bg-blue-700' : 'bg-gray-200',
+          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className={classnames(
+            enabled ? 'translate-x-5' : 'translate-x-0',
+            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
           )}
-        </div>
-        <div className={toggleHolder} onClick={() => handleFlag(!flag)}>
-          <div className={toggleButton} />
-        </div>
-      </div>
-    </>
+        />
+      </Switch>
+    </Switch.Group>
   )
 }
